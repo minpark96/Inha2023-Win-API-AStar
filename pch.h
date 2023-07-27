@@ -14,6 +14,7 @@ using std::iterator;
 #include <string>
 using std::string;
 using std::wstring;
+using std::to_wstring;
 #include <map>
 using std::map;
 #include<queue>

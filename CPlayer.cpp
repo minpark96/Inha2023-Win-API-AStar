@@ -15,6 +15,8 @@ CPlayer::CPlayer()
 	, m_vEnd{ 0, 0 }
 	, m_path()
 	, m_pathIndex()
+	, _sumTick(0)
+	, _isMove(false)
 {
 
 }
@@ -33,17 +35,30 @@ void CPlayer::update()
 	if (pCurScene->GetBoxStart() != nullptr &&
 		pCurScene->GetBoxEnd() != nullptr)
 	{
-		AStar();
 		Vec2 vPos;
-		vPos.x = (int32)(m_path[m_pathIndex].x * fDT);
-		vPos.y = (int32)(m_path[m_pathIndex].y * fDT);
-		++m_pathIndex;
-		SetPos(vPos);
+		if (!_isMove)
+		{
+			vPos = pCurScene->GetBoxStart()->GetPos();
+			SetPos(vPos);
+			AStar();
+			_isMove = true;
+		}
+
+		_sumTick += DeltaTick;
+		if (_sumTick >= MOVE_TICK)
+		{
+			_sumTick = 0;
+			vPos.x = m_path[m_pathIndex].x;
+			vPos.y = m_path[m_pathIndex].y;
+			++m_pathIndex;
+			SetPos(vPos);
+		}
 
 		if (m_pathIndex >= m_path.size())
 		{
 			pCurScene->SetBoxStart(nullptr);
 			pCurScene->SetBoxEnd(nullptr);
+			_isMove = false;
 		}
 	}
 }
@@ -53,7 +68,7 @@ void CPlayer::render(HDC _dc)
 	Vec2 vPos = GetPos();
 	Vec2 vScale = GetScale();
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(0, 255, 0));
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 255));
 	HBRUSH oldBrush = (HBRUSH)SelectObject(_dc, hBrush);
 
 	Ellipse(_dc, vPos.x - vScale.x / 2, vPos.y - vScale.y / 2
@@ -87,8 +102,8 @@ void CPlayer::AStar()
 		Vec2 { 0, 1},	// RIGHT
 		Vec2 {-1, -1},	// UP_LEFT
 		Vec2 {1, -1},	// DOWN_LEFT
-		Vec2 {1, 1},		// DOWN_RIGHT
-		Vec2 {-1, 0},	// UP_RIGHT
+		Vec2 {1, 1},	// DOWN_RIGHT
+		Vec2 {-1, 1},	// UP_RIGHT
 	};
 
 	int32 cost[] =
@@ -157,6 +172,12 @@ void CPlayer::AStar()
 		for (int32 dir = 0; dir < DIR_COUNT; dir++)
 		{
 			Vec2 nextPos = node.pos + front[dir];
+
+			if (nextPos.x < 0 || nextPos.y < 0)
+				continue;
+			if (nextPos.x > 15 || nextPos.y > 7)
+				continue;
+
 			// 갈 수 있는 지역은 맞는지 확인
 			if (CanGo(nextPos) == false)
 				continue;
@@ -175,6 +196,11 @@ void CPlayer::AStar()
 			best[nextPos.y][nextPos.x] = g + h;
 			pq.push(PQNode{ g + h, g, nextPos });
 			parent[nextPos] = node.pos;
+
+			CBox* pBox = dynamic_cast<CBox*>(pCurScene->GetBox(nextPos.x + nextPos.y * 16));
+			vector<int> data = { g, h, best[nextPos.y][nextPos.x] };
+			pBox->SetData(data);
+			pBox->SetColorRed();
 		}
 	}
 
@@ -189,6 +215,7 @@ void CPlayer::AStar()
 	{
 		pBox = dynamic_cast<CBox*>(pCurScene->GetBox(pos.x + pos.y * 16));
 		Vec2 realPos = pBox->GetPos();
+		pBox->SetColorGreen();
 		m_path.push_back(realPos);
 
 		// 시작점은 자신이 곧 부모이다
@@ -209,8 +236,8 @@ bool CPlayer::CanGo(Vec2 pos)
 
 	for (int i = 0; i < iCount; ++i)
 	{
-		CBox* pBlock = dynamic_cast<CBox*>(pCurScene->GetBox(i));
-		if (pBlock->CheckInside(pos))
+		CBox* pBlock = dynamic_cast<CBox*>(pCurScene->GetBox(pCurScene->GetBlock(i)));
+		if (pBlock->GetUnitPos() == pos)
 			return false;
 	}
 

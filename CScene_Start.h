@@ -22,6 +22,7 @@ public:
     void SetBoxEnd(CBox* _box) { m_boxEnd = _box; }
     int32 GetBoxCount() { return m_boxCount; }
     int GetBlockCount() { return arrBlock.size(); }
+    int GetBlock(int _idx) { return arrBlock[_idx]; }
 
 public:
     CScene_Start();

@@ -33,14 +33,14 @@ void CBox::update()
 {
 	if (!isBlock)
 	{
+		CScene_Start* pCurScene = dynamic_cast<CScene_Start*>
+			(CSceneMgr::GetInst()->GetCurScene());
+
 		if (KEY_TAP(KEY::MOUSELBUTTON))
 		{
 			HWND hWnd = CCore::GetInst()->GetMainHwnd();
 			GetCursorPos(&ptCursor);
 			ScreenToClient(hWnd, &ptCursor);
-
-			CScene_Start* pCurScene = dynamic_cast<CScene_Start*>
-				(CSceneMgr::GetInst()->GetCurScene());
 
 			if (pCurScene->GetBoxStart() == nullptr || 
 				pCurScene->GetBoxEnd() == nullptr)
@@ -61,6 +61,17 @@ void CBox::update()
 				}
 			}
 		}
+
+		if (pCurScene->GetBoxStart() == nullptr &&
+			pCurScene->GetBoxEnd() == nullptr)
+		{
+			arrData[0] = 0;
+			arrData[1] = 0;
+			arrData[2] = 0;
+			arrRGB[0] = 255;
+			arrRGB[1] = 255;
+			arrRGB[2] = 255;
+		}
 	}
 }
 
@@ -75,22 +86,13 @@ void CBox::render(HDC _dc)
 	Rectangle(_dc, vPos.x - vScale.x / 2, vPos.y - vScale.y / 2, 
 		vPos.x + vScale.x / 2, vPos.y + vScale.y / 2);
 
-	char buff[10];
-	sprintf_s(buff, "%d", arrData[0]);
-	TextOut(_dc, vPos.x - 24, vPos.y - 20, (LPCWSTR)buff, strlen(buff));
-	sprintf_s(buff, "%d", arrData[1]);
-	TextOut(_dc, vPos.x + 16, vPos.y - 20, (LPCWSTR)buff, strlen(buff));
-	sprintf_s(buff, "%d", arrData[2]);
-	TextOut(_dc, vPos.x - 4, vPos.y + 10, (LPCWSTR)buff, strlen(buff));
-
-	/*wchar_t szBuffer[255] = {};
-	swprintf_s(szBuffer, L"pt x : %d, pt y : %d", ptCursor.x, ptCursor.y);
-	TextOut(_dc, 0, 700, (LPCWSTR)szBuffer, wcslen(szBuffer));
-	if (CheckInside(ptCursor))
-	{
-		swprintf_s(szBuffer, L"Box x : %d, Box y : %d", (int)vPos.x, (int)vPos.y);
-		TextOut(_dc, 0, 720, (LPCWSTR)szBuffer, wcslen(szBuffer));
-	}*/
+	wstring wstrBuff;
+	wstrBuff = to_wstring(arrData[0]);
+	TextOut(_dc, vPos.x - 24, vPos.y - 20, wstrBuff.c_str(), wstrBuff.length());
+	wstrBuff = to_wstring(arrData[1]);
+	TextOut(_dc, vPos.x + 16, vPos.y - 20, wstrBuff.c_str(), wstrBuff.length());
+	wstrBuff = to_wstring(arrData[2]);
+	TextOut(_dc, vPos.x - 4, vPos.y + 10, wstrBuff.c_str(), wstrBuff.length());
 
 	SelectObject(_dc, oldBrush);
 	DeleteObject(hBrush);
@@ -101,18 +103,18 @@ bool CBox::CheckInside(const POINT& _pt)
 	Vec2 vPos = GetPos();
 	Vec2 vScale = GetScale();
 	
-	int32 fLeft = vPos.x - vScale.x / 2;
-	int32 fRight = vPos.x + vScale.x / 2;
-	int32 fUp = vPos.y - vScale.y / 2;
-	int32 fBottom = vPos.y + vScale.y / 2;
+	int32 iLeft = vPos.x - vScale.x / 2;
+	int32 iRight = vPos.x + vScale.x / 2;
+	int32 iUp = vPos.y - vScale.y / 2;
+	int32 iBottom = vPos.y + vScale.y / 2;
 
-	if (_pt.x < fLeft)
+	if (_pt.x < iLeft)
 		return false;
-	if (_pt.x > fRight)
+	if (_pt.x > iRight)
 		return false;
-	if (_pt.y < fUp)
+	if (_pt.y < iUp)
 		return false;
-	if (_pt.y > fBottom)
+	if (_pt.y > iBottom)
 		return false;
 	
 	return true;
@@ -128,18 +130,18 @@ bool CBox::CheckInside(const Vec2& _pt)
 	Vec2 vPos = GetPos();
 	Vec2 vScale = GetScale();
 
-	int32 fLeft = vPos.x - vScale.x / 2;
-	int32 fRight = vPos.x + vScale.x / 2;
-	int32 fUp = vPos.y - vScale.y / 2;
-	int32 fBottom = vPos.y + vScale.y / 2;
+	int32 iLeft = vPos.x - vScale.x / 2;
+	int32 iRight = vPos.x + vScale.x / 2;
+	int32 iUp = vPos.y - vScale.y / 2;
+	int32 iBottom = vPos.y + vScale.y / 2;
 
-	if (_pt.x < fLeft)
+	if (_pt.x < iLeft)
 		return false;
-	if (_pt.x > fRight)
+	if (_pt.x > iRight)
 		return false;
-	if (_pt.y < fUp)
+	if (_pt.y < iUp)
 		return false;
-	if (_pt.y > fBottom)
+	if (_pt.y > iBottom)
 		return false;
 
 	return true;

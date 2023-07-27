@@ -10,6 +10,9 @@ CTimeMgr::CTimeMgr()
 	, m_dDT(0.)
 	, m_dAcc(0.)
 	, m_iCallCount(0)
+	, lastTick(0)
+	, currentTick(0)
+	, deltaTick(0)
 {
 
 }
@@ -31,6 +34,10 @@ void CTimeMgr::init()
 
 void CTimeMgr::update()
 {
+	currentTick = ::GetTickCount64();
+	deltaTick = currentTick - lastTick;
+	lastTick = currentTick;
+
 	QueryPerformanceCounter(&m_llCurCount);
 
 	// 이전 프레임의 카운팅과, 현재 프레임 카운팅 값의 차이를 구한다.
