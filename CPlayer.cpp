@@ -159,8 +159,8 @@ void CPlayer::AStar()
 		// [선택]
 		if (closed[node.pos.y][node.pos.x])
 			continue;
-		if (best[node.pos.y][node.pos.x] < node.f)
-			continue;
+		//if (best[node.pos.y][node.pos.x] < node.f)
+			//continue;
 
 		// 방문
 		closed[node.pos.y][node.pos.x] = true;
@@ -173,14 +173,16 @@ void CPlayer::AStar()
 		{
 			Vec2 nextPos = node.pos + front[dir];
 
+			// 격자를 벗어난 위치인지 확인
 			if (nextPos.x < 0 || nextPos.y < 0)
 				continue;
 			if (nextPos.x > 15 || nextPos.y > 7)
 				continue;
 
-			// 갈 수 있는 지역은 맞는지 확인
+			// 갈 수 있는 지역은 맞는지 확인 (블록인지 확인)
 			if (CanGo(nextPos) == false)
 				continue;
+
 			// [선택] 이미 방문한 곳이면 스킵
 			if (closed[nextPos.y][nextPos.x])
 				continue;

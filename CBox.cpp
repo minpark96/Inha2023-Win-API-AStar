@@ -65,12 +65,12 @@ void CBox::update()
 		if (pCurScene->GetBoxStart() == nullptr &&
 			pCurScene->GetBoxEnd() == nullptr)
 		{
-			arrData[0] = 0;
-			arrData[1] = 0;
-			arrData[2] = 0;
-			arrRGB[0] = 255;
-			arrRGB[1] = 255;
-			arrRGB[2] = 255;
+			//arrData[0] = 0;
+			//arrData[1] = 0;
+			//arrData[2] = 0;
+			//arrRGB[0] = 255;
+			//arrRGB[1] = 255;
+			//arrRGB[2] = 255;
 		}
 	}
 }
